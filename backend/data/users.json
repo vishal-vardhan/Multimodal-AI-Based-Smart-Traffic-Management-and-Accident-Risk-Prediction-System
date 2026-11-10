@@ -1,0 +1,114 @@
+[
+  {
+    "id": "USR-001",
+    "email": "admin@traffic.ai",
+    "name": "Traffic System Admin",
+    "role": "admin",
+    "passwordHash": "$2b$10$N0OSKqt9SS3wV64KZ9njR.jPam2WqL/y4I9eULStfPhB7Upk6/Hx2",
+    "created_at": "2026-10-27T00:00:00.000Z"
+  },
+  {
+    "id": "USR-002",
+    "email": "operator@traffic.ai",
+    "name": "Cyberabad Control Operator",
+    "role": "operator",
+    "passwordHash": "$2b$10$8dITUtW/qHMfytsz7jgNb.UouMB/9R925DhVoIx.uDqcvgGqdhSFO",
+    "created_at": "2026-10-27T00:00:00.000Z"
+  },
+  {
+    "id": "USR-003",
+    "email": "newuser_1793128882162@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$jo/MFt.WRjvtBwDydbP77OEF9LYQqupTLYpF6SVd7llkBu8TlPYH6",
+    "created_at": "2026-10-27T19:21:22.787Z"
+  },
+  {
+    "id": "USR-004",
+    "email": "newuser_1793129124837@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$JXFkdXplFr2meIFRmRE0dOIDhwRNaBGGc7SSAp7lfZgX29wl9gQFi",
+    "created_at": "2026-10-27T19:25:25.490Z"
+  },
+  {
+    "id": "USR-005",
+    "email": "newuser_1793129178615@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$.XdsVDu/kLHfRKukaLhMN.zKUfB6H//InZGTKmTBecG2H1I6uObYq",
+    "created_at": "2026-10-27T19:26:19.202Z"
+  },
+  {
+    "id": "USR-006",
+    "email": "newuser_1793129420577@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$HTjygNe4B/XwLcv/R8Us1OyQVDTIfeCW5whpsEkTSVNBklRiR3DU.",
+    "created_at": "2026-10-27T19:30:21.107Z"
+  },
+  {
+    "id": "USR-007",
+    "email": "newuser_1793129799442@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$vH8g4lwEy.oCLEEXa7DnIuqZyu6.Btfz86ehdmH8N.qQIGS4/jsIO",
+    "created_at": "2026-10-27T19:36:40.004Z"
+  },
+  {
+    "id": "USR-008",
+    "email": "newuser_1793129866718@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$H/QTuQ.b1R1gV8e3garlQuvsicd2tU2MJZUlzUuh6J.N25biPjJuy",
+    "created_at": "2026-10-27T19:37:47.199Z"
+  },
+  {
+    "id": "USR-009",
+    "email": "newuser_1793129884294@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$fOIeR2dDeFAX7WjExJ3hF.0ICxvVWfh07.eB1KD18pIuTQWrDw/rC",
+    "created_at": "2026-10-27T19:38:04.864Z"
+  },
+  {
+    "id": "USR-010",
+    "email": "newuser_1793183008080@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$GjlL5XLlEZfsbRmOxLBuE.goNKptumTSh9RM9TlqlLiFVPmjdDV0C",
+    "created_at": "2026-10-28T10:23:28.601Z"
+  },
+  {
+    "id": "USR-011",
+    "email": "newuser_1793183194819@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$GpRKKbriG1raOvIrs8jnD.N25sWnR2Z.HffE6UNHDjh5aZa/n8wCW",
+    "created_at": "2026-10-28T10:26:35.334Z"
+  },
+  {
+    "id": "USR-012",
+    "email": "newuser_1793183442246@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$S2GHWoelU6cbEaJWizdMfeVRBTevtRbvfLJveDOXiS2YauqfHLwM.",
+    "created_at": "2026-10-28T10:30:42.723Z"
+  },
+  {
+    "id": "USR-013",
+    "email": "newuser_1793198600302@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$hmNOyo.uXBONBCgFS3vo5e1.8iHTv2nM6VQ8HByq7Mmn/j2DBljTG",
+    "created_at": "2026-10-28T14:43:21.138Z"
+  },
+  {
+    "id": "USR-014",
+    "email": "newuser_1793204456222@traffic.ai",
+    "name": "Traffic Engineer",
+    "role": "operator",
+    "passwordHash": "$2b$10$N74jH2CeJR8bBwNEdmuTcekQ2scPqRmI3L1VSbYJ.R60KiU8drI9m",
+    "created_at": "2026-10-28T16:20:56.869Z"
+  }
+]

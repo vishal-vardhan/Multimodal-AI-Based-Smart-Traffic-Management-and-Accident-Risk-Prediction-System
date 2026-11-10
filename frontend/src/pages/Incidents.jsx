@@ -1,0 +1,471 @@
+// src/pages/Incidents.jsx
+//
+// Incidents page — shows persistent incident logs and bottlenecks triggered by
+// high vehicle density frames, simulation scenarios, or road obstruction events.
+//
+// Features:
+//   • Real-time updates via Socket.io
+//   • Persistent history fetched from backend (/api/incidents)
+//   • Filter tabs: All, Active, Dispatched, Resolved
+//   • Live Quick-Action buttons: "Dispatch", "Resolve", "Reopen"
+//   • Dynamic status badge transitions (Red for Active, Yellow for Dispatched, Green for Resolved)
+//   • Interactive success toast notification confirming actions for live presentations
+//   • Severity and risk score indicators
+
+import { useState, useEffect } from 'react'
+import { fetchIncidents, updateIncidentStatus, resolveIncident } from '../services/api.js'
+import socket from '../services/socket.js'
+import { useAuth } from '../context/AuthContext.jsx'
+
+const SEVERITY_BADGE = {
+  Low:      'badge badge--free',
+  Medium:   'badge badge--moderate',
+  High:     'badge badge--heavy',
+  Critical: 'badge badge--critical',
+}
+
+export default function Incidents() {
+  const { isAdmin } = useAuth()
+  const [incidents, setIncidents] = useState([])
+  const [analytics, setAnalytics] = useState(null)
+  const [filterStatus, setFilterStatus] = useState('All') // 'All' | 'Active' | 'Dispatched' | 'Resolved'
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [updatingId, setUpdatingId] = useState(null)
+  const [toast, setToast] = useState(null)
+
+  const loadIncidents = async () => {
+    try {
+      setLoading(true)
+      const data = await fetchIncidents()
+      setIncidents(data.incidents || [])
+      setAnalytics(data.analytics || null)
+      setError(null)
+    } catch (err) {
+      setError(err.message)
+      setIncidents([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadIncidents()
+
+    // Connect to WebSocket for instant real-time incident updates
+    socket.connect()
+    const onLiveUpdate = (payload) => {
+      if (payload && payload.incidents) {
+        setIncidents(payload.incidents)
+        if (payload.incident_analytics) {
+          setAnalytics(payload.incident_analytics)
+        }
+        setError(null)
+        setLoading(false)
+      }
+    }
+
+    socket.on('live_traffic_update', onLiveUpdate)
+
+    return () => {
+      socket.off('live_traffic_update', onLiveUpdate)
+    }
+  }, [])
+
+  // Auto-dismiss toast notification after 3.8 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3800)
+      return () => clearTimeout(timer)
+    }
+  }, [toast])
+
+  const handleUpdateStatus = async (id, newStatus, locationName) => {
+    try {
+      setUpdatingId(id)
+
+      // 1. Optimistic UI update for instantaneous responsiveness
+      setIncidents(prev =>
+        prev.map(inc => {
+          if (inc.id === id) {
+            return {
+              ...inc,
+              status: newStatus,
+              resolved_at: newStatus === 'Resolved' ? new Date().toISOString() : null,
+              dispatched_at: newStatus === 'Dispatched' ? new Date().toISOString() : null,
+            }
+          }
+          return inc
+        })
+      )
+
+      // 2. Broadcast immediately over WebSocket to peer clients
+      socket.emit('update_incident_status', { id, status: newStatus })
+      if (newStatus === 'Resolved') {
+        socket.emit('resolve_incident', id)
+      }
+
+      // 3. Persist update via backend REST API
+      await updateIncidentStatus(id, newStatus)
+
+      // 4. Trigger success toast notification
+      const statusLabels = {
+        Active: 'Reopened as Active Bottleneck',
+        Dispatched: 'Emergency Response Units Dispatched',
+        Resolved: 'Incident Successfully Resolved'
+      }
+
+      setToast({
+        id,
+        status: newStatus,
+        title: statusLabels[newStatus] || `Status Updated: ${newStatus}`,
+        message: `Incident ${id} at ${locationName || 'corridor'} is now ${newStatus.toUpperCase()}.`,
+        type: newStatus.toLowerCase()
+      })
+    } catch (err) {
+      console.error('Failed to update incident status:', err)
+      loadIncidents()
+      setToast({
+        id,
+        status: 'error',
+        title: 'Action Error',
+        message: err.message || 'Could not update incident status.',
+        type: 'active'
+      })
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
+  // Filtered incidents based on active tab
+  const filteredIncidents = incidents.filter(inc => {
+    const s = (inc.status || 'Active').toLowerCase()
+    if (filterStatus === 'Active') return s === 'active'
+    if (filterStatus === 'Dispatched') return s === 'dispatched'
+    if (filterStatus === 'Resolved') return s === 'resolved'
+    return true
+  })
+
+  const activeCount = incidents.filter(i => (i.status || 'Active').toLowerCase() === 'active').length
+  const dispatchedCount = incidents.filter(i => (i.status || '').toLowerCase() === 'dispatched').length
+  const resolvedCount = incidents.filter(i => (i.status || '').toLowerCase() === 'resolved').length
+
+  const formatTimestamp = (ts) => {
+    if (!ts) return 'N/A'
+    try {
+      const d = new Date(ts)
+      if (isNaN(d.getTime())) return String(ts)
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    } catch {
+      return String(ts)
+    }
+  }
+
+  const renderStatusBadge = (status) => {
+    const s = (status || 'Active').toLowerCase()
+    if (s === 'resolved') {
+      return (
+        <span className="badge-status badge-status--resolved">
+          <span>✓</span> Resolved
+        </span>
+      )
+    }
+    if (s === 'dispatched') {
+      return (
+        <span className="badge-status badge-status--dispatched">
+          <span>⚡</span> Dispatched
+        </span>
+      )
+    }
+    return (
+      <span className="badge-status badge-status--active">
+        <span>●</span> Active
+      </span>
+    )
+  }
+
+  const renderActionButtons = (inc) => {
+    const status = inc.status || 'Active'
+    const isBusy = updatingId === inc.id
+    const loc = inc.node_location || inc.zone_name || 'Corridor'
+
+    if (status === 'Active') {
+      return (
+        <div className="incident-actions-group">
+          <button
+            className="btn-action btn-action--dispatch"
+            disabled={isBusy}
+            onClick={() => handleUpdateStatus(inc.id, 'Dispatched', loc)}
+            title="Dispatch patrol units, recovery cranes, or signal clearance"
+          >
+            {isBusy ? '…' : '⚡ Dispatch'}
+          </button>
+          <button
+            className="btn-action btn-action--resolve"
+            disabled={isBusy}
+            onClick={() => handleUpdateStatus(inc.id, 'Resolved', loc)}
+            title="Mark incident as cleared and resolved"
+          >
+            {isBusy ? '…' : '✓ Resolve'}
+          </button>
+        </div>
+      )
+    }
+
+    if (status === 'Dispatched') {
+      return (
+        <div className="incident-actions-group">
+          <button
+            className="btn-action btn-action--resolve"
+            disabled={isBusy}
+            onClick={() => handleUpdateStatus(inc.id, 'Resolved', loc)}
+            title="Confirm traffic normalization and resolve"
+          >
+            {isBusy ? '…' : '✓ Resolve'}
+          </button>
+          <button
+            className="btn-action btn-action--reopen"
+            disabled={isBusy}
+            onClick={() => handleUpdateStatus(inc.id, 'Active', loc)}
+            title="Revert back to Active status"
+          >
+            {isBusy ? '…' : '↩ Active'}
+          </button>
+        </div>
+      )
+    }
+
+    // Resolved
+    return (
+      <div className="incident-actions-group">
+        <button
+          className="btn-action btn-action--reopen"
+          disabled={isBusy}
+          onClick={() => handleUpdateStatus(inc.id, 'Active', loc)}
+          title="Reopen this incident for demonstration or recurrence"
+        >
+          {isBusy ? '…' : '↺ Reopen'}
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="page-container">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">⚠️ Live Incidents &amp; Status Resolver</h1>
+          <p className="page-subtitle">
+            Interactive bottleneck status control: dispatch field units, resolve anomalies, and synchronize across all live dashboard clients
+          </p>
+        </div>
+        <button className="btn-refresh" onClick={loadIncidents}>🔄 Refresh</button>
+      </div>
+
+      {/* Summary KPI Cards */}
+      <div className="summary-grid" style={{ marginBottom: '1.5rem' }}>
+        <div className="card stat-card">
+          <div className="stat-card__label">Total Recorded</div>
+          <div className="stat-card__value">{incidents.length}</div>
+          <div className="stat-card__note">Persistent JSON database</div>
+        </div>
+
+        <div className="card stat-card">
+          <div className="stat-card__label">Active Bottlenecks</div>
+          <div className="stat-card__value" style={{ color: activeCount > 0 ? 'var(--red, #dc2626)' : 'var(--green, #059669)' }}>
+            {activeCount}
+          </div>
+          <div className="stat-card__note">Requires immediate clearance</div>
+        </div>
+
+        <div className="card stat-card">
+          <div className="stat-card__label">Units Dispatched</div>
+          <div className="stat-card__value" style={{ color: dispatchedCount > 0 ? 'var(--amber, #d97706)' : 'var(--text-3)' }}>
+            {dispatchedCount}
+          </div>
+          <div className="stat-card__note">Traffic police en route</div>
+        </div>
+
+        <div className="card stat-card">
+          <div className="stat-card__label">Resolved Incidents</div>
+          <div className="stat-card__value" style={{ color: 'var(--green, #059669)' }}>
+            {resolvedCount}
+          </div>
+          <div className="stat-card__note">Normal flow restored</div>
+        </div>
+
+        <div className="card stat-card">
+          <div className="stat-card__label">Avg Risk Score (Rt)</div>
+          <div className="stat-card__value" style={{ color: 'var(--amber, #d97706)' }}>
+            {analytics?.average_risk_score ?? (incidents.length > 0 ? Math.round(incidents.reduce((s, i) => s + (i.risk_score || i.score || 0), 0) / incidents.length) : 0)}
+          </div>
+          <div className="stat-card__note">Rule-based score scale 0–100</div>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="incident-tabs" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-3)', marginRight: '0.5rem' }}>Filter by Status:</span>
+        <button
+          className={`incident-tab-btn ${filterStatus === 'All' ? 'incident-tab-btn--active' : ''}`}
+          onClick={() => setFilterStatus('All')}
+        >
+          All ({incidents.length})
+        </button>
+        <button
+          className={`incident-tab-btn ${filterStatus === 'Active' ? 'incident-tab-btn--active' : ''}`}
+          onClick={() => setFilterStatus('Active')}
+        >
+          🔴 Active ({activeCount})
+        </button>
+        <button
+          className={`incident-tab-btn ${filterStatus === 'Dispatched' ? 'incident-tab-btn--active' : ''}`}
+          onClick={() => setFilterStatus('Dispatched')}
+        >
+          🟡 Dispatched ({dispatchedCount})
+        </button>
+        <button
+          className={`incident-tab-btn ${filterStatus === 'Resolved' ? 'incident-tab-btn--active' : ''}`}
+          onClick={() => setFilterStatus('Resolved')}
+        >
+          🟢 Resolved ({resolvedCount})
+        </button>
+      </div>
+
+      {/* Data provenance notice */}
+      <div className="demo-banner" role="note">
+        <span aria-hidden="true">⚡</span>
+        <span>
+          <strong>Live Quick-Action Resolver:</strong> Click <strong>Dispatch</strong> or <strong>Resolve</strong> next to any bottleneck.
+          Status updates synchronize immediately over WebSockets to all connected traffic-control clients and persist to <code>backend/data/incidents.json</code>.
+        </span>
+      </div>
+
+      {/* Error state */}
+      {error && (
+        <div className="demo-banner" role="alert" aria-live="polite">
+          <span aria-hidden="true">⚠️</span>
+          <span>Backend unavailable — incident data cannot be loaded. ({error})</span>
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && !error && (
+        <div className="page-empty-state">
+          <span className="page-empty-state__icon">⏳</span>
+          <p>Loading incident records…</p>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && filteredIncidents.length === 0 && (
+        <div className="page-empty-state">
+          <span className="page-empty-state__icon">✅</span>
+          <h2>No {filterStatus !== 'All' ? filterStatus : ''} Incidents Found</h2>
+          <p>
+            {filterStatus === 'Active'
+              ? 'All traffic incidents are currently dispatched or resolved.'
+              : filterStatus === 'Dispatched'
+              ? 'No field units are currently dispatched.'
+              : 'No incident records match the selected filter.'}
+          </p>
+        </div>
+      )}
+
+      {/* Persistent Incident table */}
+      {!loading && filteredIncidents.length > 0 && (
+        <div className="card">
+          <div className="card__header">
+            <span className="card__title">Live Incident &amp; Bottleneck Log</span>
+            <span className="card__subtitle">{filteredIncidents.length} shown</span>
+          </div>
+          <div className="card__body--flush">
+            <table className="det-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Time</th>
+                  <th>Location Node</th>
+                  <th>Vehicles</th>
+                  <th>Severity</th>
+                  <th>Score (Rt)</th>
+                  <th>Status</th>
+                  <th>Live Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredIncidents.map(inc => {
+                  const score = inc.risk_score !== undefined ? inc.risk_score : (inc.score || 0)
+                  return (
+                    <tr key={inc.id}>
+                      <td className="det-id" style={{ whiteSpace: 'nowrap' }}>{inc.id}</td>
+                      <td className="det-time">{formatTimestamp(inc.timestamp || inc.timestamp_sec)}</td>
+                      <td className="det-class">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <strong>{inc.node_location || inc.zone_name}</strong>
+                          {inc.sub_zone && (
+                            <span style={{ fontSize: '0.7rem', background: '#eff6ff', color: 'var(--blue)', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 600 }}>
+                              📍 {inc.sub_zone}
+                            </span>
+                          )}
+                        </div>
+                        {inc.description && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-3)', marginTop: '2px' }}>
+                            {inc.description}
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ fontWeight: 700, color: 'var(--amber)' }}>
+                        {inc.vehicle_count || '—'}
+                      </td>
+                      <td>
+                        <span className={SEVERITY_BADGE[inc.severity] || 'badge'}>
+                          {inc.severity}
+                        </span>
+                      </td>
+                      <td style={{ fontFamily: 'var(--mono)', fontWeight: 600 }}>
+                        {score}
+                      </td>
+                      <td>
+                        {renderStatusBadge(inc.status)}
+                      </td>
+                      <td>
+                        {renderActionButtons(inc)}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Success Toast Notification */}
+      {toast && (
+        <div className="incident-toast-container">
+          <div className={`incident-toast incident-toast--${toast.type || 'active'}`}>
+            <span className="incident-toast__icon">
+              {toast.type === 'dispatched' ? '⚡' : toast.type === 'resolved' ? '✅' : '🔴'}
+            </span>
+            <div className="incident-toast__content">
+              <span className="incident-toast__title">
+                {toast.title}
+              </span>
+              <span className="incident-toast__desc">
+                {toast.message}
+              </span>
+            </div>
+            <button
+              className="incident-toast__close"
+              onClick={() => setToast(null)}
+              aria-label="Dismiss toast"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

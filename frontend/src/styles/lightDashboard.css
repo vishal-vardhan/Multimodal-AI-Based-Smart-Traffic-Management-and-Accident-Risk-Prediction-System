@@ -1,0 +1,783 @@
+/* frontend/src/styles/lightDashboard.css
+ * Clean White / Light Theme Stylesheet for the Traffic Management Dashboard.
+ * Matches the reference blueprint with high contrast, pure white surfaces, and dark text.
+ * Fully responsive for mobile, tablet, desktop, and 4K screens.
+ */
+
+:root {
+  --tmd-bg-page: #f8fafc;
+  --tmd-bg-card: #ffffff;
+  --tmd-bg-subtle: #f1f5f9;
+  --tmd-bg-hover: #f8fafc;
+  --tmd-border: #e2e8f0;
+  --tmd-border-focus: #94a3b8;
+  --tmd-text-primary: #0f172a;
+  --tmd-text-secondary: #334155;
+  --tmd-text-muted: #64748b;
+  --tmd-text-light: #94a3b8;
+
+  --tmd-green: #16a34a;
+  --tmd-green-light: #dcfce7;
+  --tmd-green-border: #86efac;
+
+  --tmd-amber: #d97706;
+  --tmd-amber-light: #fef3c7;
+  --tmd-amber-border: #fde68a;
+
+  --tmd-red: #dc2626;
+  --tmd-red-light: #fee2e2;
+  --tmd-red-border: #fca5a5;
+
+  --tmd-blue: #2563eb;
+  --tmd-blue-light: #eff6ff;
+  --tmd-blue-border: #bfdbfe;
+
+  --tmd-cyan: #0891b2;
+  --tmd-cyan-light: #ecfeff;
+
+  --tmd-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --tmd-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.03);
+  --tmd-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.09), 0 4px 8px rgba(15, 23, 42, 0.04);
+}
+
+/* ─── Dashboard View Mode Switcher Strip ─────────────────────────────────────── */
+.tmd-view-switcher-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  width: fit-content;
+  margin: 0.5rem auto 1rem;
+}
+.tmd-view-pill {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.tmd-view-pill:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+.tmd-view-pill--active {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* ─── Page Container ────────────────────────────────────────────────────────── */
+.tmd-root {
+  background-color: var(--tmd-bg-page);
+  color: var(--tmd-text-primary);
+  min-height: 100vh;
+  padding: 1rem 1.25rem 2.5rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* ─── Header Bar ───────────────────────────────────────────────────────────── */
+.tmd-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--tmd-bg-card);
+  border: 1px solid var(--tmd-border);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  box-shadow: var(--tmd-shadow-sm);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.tmd-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tmd-badge-pill {
+  background: #f1f5f9;
+  border: 1px solid var(--tmd-border);
+  color: var(--tmd-text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tmd-badge-pill--live {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: var(--tmd-green);
+}
+
+.tmd-header-title-wrap {
+  text-align: center;
+}
+
+.tmd-header-main-title {
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--tmd-text-primary);
+  margin: 0;
+}
+
+.tmd-header-subtitle {
+  font-size: 0.72rem;
+  color: var(--tmd-text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.tmd-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.tmd-btn-settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #ffffff;
+  border: 1px solid var(--tmd-border);
+  color: var(--tmd-text-secondary);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tmd-btn-settings:hover {
+  background: #f8fafc;
+  border-color: var(--tmd-border-focus);
+  color: var(--tmd-text-primary);
+}
+
+/* ─── Top 4 KPI Metrics Row ────────────────────────────────────────────────── */
+.tmd-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.tmd-kpi-card {
+  background: var(--tmd-bg-card);
+  border: 1px solid var(--tmd-border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--tmd-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tmd-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--tmd-shadow-hover);
+  border-color: #cbd5e1;
+}
+
+.tmd-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.tmd-kpi-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tmd-text-muted);
+}
+
+.tmd-kpi-indicator {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.tmd-kpi-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tmd-kpi-number {
+  font-size: 2.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--tmd-text-primary);
+}
+
+.tmd-kpi-number--green  { color: var(--tmd-green); }
+.tmd-kpi-number--amber  { color: var(--tmd-amber); }
+.tmd-kpi-number--red    { color: var(--tmd-red); }
+.tmd-kpi-number--blue   { color: var(--tmd-blue); }
+
+.tmd-kpi-unit {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--tmd-text-secondary);
+}
+
+.tmd-kpi-note {
+  font-size: 0.72rem;
+  color: var(--tmd-text-muted);
+  margin-top: 0.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ─── 3-Column Main Grid ───────────────────────────────────────────────────── */
+.tmd-main-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 1.15fr 1fr;
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.tmd-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* ─── Panel Base ───────────────────────────────────────────────────────────── */
+.tmd-panel {
+  background: var(--tmd-bg-card);
+  border: 1px solid var(--tmd-border);
+  border-radius: 12px;
+  box-shadow: var(--tmd-shadow-sm);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.tmd-panel:hover {
+  border-color: #cbd5e1;
+}
+
+.tmd-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--tmd-border);
+  background: #ffffff;
+}
+
+.tmd-panel-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--tmd-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.tmd-panel-meta {
+  font-size: 0.72rem;
+  color: var(--tmd-text-muted);
+  font-weight: 600;
+}
+
+.tmd-panel-body {
+  padding: 1.1rem;
+}
+
+.tmd-panel-body--flush {
+  padding: 0;
+}
+
+/* ─── Live Traffic Map Component ───────────────────────────────────────────── */
+.tmd-map-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+  font-size: 0.76rem;
+  color: var(--tmd-text-secondary);
+}
+
+.tmd-map-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--tmd-text-primary);
+}
+
+.tmd-map-container {
+  height: 290px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--tmd-border);
+}
+
+/* ─── Average Speed by Corridor ────────────────────────────────────────────── */
+.tmd-corridors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tmd-corridor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tmd-corridor-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tmd-corridor-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--tmd-text-primary);
+}
+
+.tmd-corridor-speed {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--tmd-text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tmd-progress-track {
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.tmd-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+
+.tmd-progress-fill--green {
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+}
+
+.tmd-progress-fill--amber {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.tmd-progress-fill--red {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.tmd-corridors-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  padding: 0 0.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--tmd-text-muted);
+}
+
+/* ─── Transit Status Strip ─────────────────────────────────────────────────── */
+.tmd-transit-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid var(--tmd-border);
+  border-radius: 10px;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tmd-transit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tmd-transit-item--amber { color: var(--tmd-amber); }
+.tmd-transit-item--red   { color: var(--tmd-red); }
+.tmd-transit-item--green { color: var(--tmd-green); }
+
+/* ─── Center Column: CCTV Feeds Grid ───────────────────────────────────────── */
+.tmd-cctv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+}
+
+.tmd-cctv-card {
+  background: #0f172a;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #334155;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tmd-cctv-card:hover {
+  transform: scale(1.02);
+  border-color: #38bdf8;
+}
+
+.tmd-cctv-top {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.45rem;
+  right: 0.45rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+
+.tmd-cctv-badge {
+  background: rgba(15, 23, 42, 0.75);
+  color: #38bdf8;
+  font-size: 0.62rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.tmd-cctv-live-tag {
+  background: rgba(220, 38, 38, 0.85);
+  color: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  padding: 0.12rem 0.35rem;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  animation: pulse 2s infinite;
+}
+
+.tmd-cctv-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.4rem 0.55rem;
+  background: linear-gradient(0deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0) 100%);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.tmd-cctv-name {
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.tmd-cctv-count {
+  color: #fbbf24;
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+.tmd-cctv-sublist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+/* ─── Incident Response Times ──────────────────────────────────────────────── */
+.tmd-response-times-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.tmd-response-tile {
+  background: #f8fafc;
+  border: 1px solid var(--tmd-border);
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tmd-response-num {
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.1;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tmd-response-num--red   { color: var(--tmd-red); }
+.tmd-response-num--amber { color: var(--tmd-amber); }
+.tmd-response-num--green { color: var(--tmd-green); }
+
+.tmd-response-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--tmd-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ─── Right Column: Incident Summary ───────────────────────────────────────── */
+.tmd-incidents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.tmd-incident-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--tmd-border);
+  transition: all 0.2s ease;
+}
+
+.tmd-incident-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.tmd-incident-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.tmd-indicator-square {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.tmd-indicator-square--red   { background-color: var(--tmd-red); box-shadow: 0 0 6px rgba(220, 38, 38, 0.4); }
+.tmd-indicator-square--amber { background-color: var(--tmd-amber); box-shadow: 0 0 6px rgba(217, 119, 6, 0.4); }
+.tmd-indicator-square--blue  { background-color: var(--tmd-blue); box-shadow: 0 0 6px rgba(37, 99, 235, 0.4); }
+
+.tmd-incident-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--tmd-text-primary);
+}
+
+.tmd-incident-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--tmd-text-muted);
+}
+
+/* ─── Signal Performance Gauges ────────────────────────────────────────────── */
+.tmd-gauges-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+.tmd-gauge-card {
+  background: #f8fafc;
+  border: 1px solid var(--tmd-border);
+  border-radius: 10px;
+  padding: 0.85rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tmd-gauge-svg-wrap {
+  position: relative;
+  width: 120px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tmd-gauge-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tmd-gauge-unit {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.tmd-gauge-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.tmd-gauge-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--tmd-text-primary);
+  margin-top: 0.2rem;
+}
+
+/* ─── Weather & Conditions ─────────────────────────────────────────────────── */
+.tmd-weather-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  gap: 0.85rem;
+}
+
+.tmd-weather-icon-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tmd-weather-cloud {
+  font-size: 2.3rem;
+  line-height: 1;
+}
+
+.tmd-weather-main {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--tmd-text-primary);
+}
+
+.tmd-weather-temp {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--tmd-text-primary);
+}
+
+.tmd-visibility-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.tmd-visibility-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--tmd-text-muted);
+}
+
+.tmd-visibility-bars {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tmd-vis-bar {
+  width: 20px;
+  height: 5px;
+  background: #38bdf8;
+  border-radius: 999px;
+}
+
+/* ─── Responsive Media Queries ─────────────────────────────────────────────── */
+@media (max-width: 1400px) {
+  .tmd-main-layout {
+    grid-template-columns: 1.25fr 1fr;
+  }
+  .tmd-col-right {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.1rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .tmd-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tmd-main-layout {
+    grid-template-columns: 1fr;
+  }
+  .tmd-col-right {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .tmd-root {
+    padding: 0.75rem;
+  }
+  .tmd-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .tmd-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .tmd-header-left, .tmd-header-right {
+    justify-content: center;
+  }
+  .tmd-cctv-grid, .tmd-cctv-sublist {
+    grid-template-columns: 1fr;
+  }
+  .tmd-gauges-row {
+    grid-template-columns: 1fr;
+  }
+}
